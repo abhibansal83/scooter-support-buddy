@@ -136,11 +136,61 @@ export type Database = {
         }
         Relationships: []
       }
+      scooter_orders: {
+        Row: {
+          created_at: string
+          customer_notes: string | null
+          delivery_address: string
+          delivery_status: string
+          estimated_delivery_date: string | null
+          id: string
+          order_date: string
+          phone_number: string | null
+          scooter_model: string
+          total_amount: number
+          tracking_number: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_notes?: string | null
+          delivery_address: string
+          delivery_status?: string
+          estimated_delivery_date?: string | null
+          id?: string
+          order_date?: string
+          phone_number?: string | null
+          scooter_model: string
+          total_amount: number
+          tracking_number?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          customer_notes?: string | null
+          delivery_address?: string
+          delivery_status?: string
+          estimated_delivery_date?: string | null
+          id?: string
+          order_date?: string
+          phone_number?: string | null
+          scooter_model?: string
+          total_amount?: number
+          tracking_number?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       support_queries: {
         Row: {
           chat_message_id: string | null
           created_at: string
           id: string
+          inquiry_type: string | null
+          order_id: string | null
           query_content: string
           status: string
           updated_at: string
@@ -150,6 +200,8 @@ export type Database = {
           chat_message_id?: string | null
           created_at?: string
           id?: string
+          inquiry_type?: string | null
+          order_id?: string | null
           query_content: string
           status?: string
           updated_at?: string
@@ -159,12 +211,22 @@ export type Database = {
           chat_message_id?: string | null
           created_at?: string
           id?: string
+          inquiry_type?: string | null
+          order_id?: string | null
           query_content?: string
           status?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "support_queries_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "scooter_orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

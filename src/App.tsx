@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Chat from "./pages/Chat";
+import Orders from "./pages/Orders";
 import SupportQueries from "./pages/SupportQueries";
 import SupportDashboard from "./pages/SupportDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -32,6 +33,11 @@ const App = () => (
             <Route path="/chat" element={
               <ProtectedRoute>
                 <Chat />
+              </ProtectedRoute>
+            } />
+            <Route path="/orders" element={
+              <ProtectedRoute>
+                <Orders />
               </ProtectedRoute>
             } />
         <Route path="/support-queries" element={

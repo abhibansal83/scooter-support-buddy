@@ -60,13 +60,16 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          <Card className="electric-shadow border-border/50 hover:shadow-lg transition-smooth cursor-pointer">
+          <Card 
+            className="electric-shadow border-border/50 hover:shadow-lg transition-smooth cursor-pointer"
+            onClick={() => navigate('/orders')}
+          >
             <CardContent className="p-4 text-center">
               <div className="rounded-full p-3 bg-primary/10 w-fit mx-auto mb-3">
                 <Package className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="font-semibold text-foreground mb-1">Track Order</h3>
-              <p className="text-xs text-muted-foreground">Check delivery status</p>
+              <h3 className="font-semibold text-foreground mb-1">Orders</h3>
+              <p className="text-xs text-muted-foreground">Manage & track orders</p>
             </CardContent>
           </Card>
         </div>
