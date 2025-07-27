@@ -2,6 +2,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Zap, MessageCircle, Package, Settings, LogOut, Phone } from 'lucide-react';
+import CustomerSupport from '@/components/CustomerSupport';
 
 const Index = () => {
   const { user, signOut } = useAuth();
@@ -66,20 +67,8 @@ const Index = () => {
           </Card>
         </div>
 
-        {/* Recent Conversations */}
-        <Card className="electric-shadow border-border/50">
-          <CardHeader>
-            <CardTitle className="text-lg text-foreground">Recent Conversations</CardTitle>
-            <CardDescription>Your latest support interactions</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-muted-foreground">
-              <MessageCircle className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p>No conversations yet</p>
-              <p className="text-sm">Start by asking a question</p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Customer Support FAQ */}
+        <CustomerSupport />
 
         {/* Help & Settings */}
         <div className="space-y-3">
