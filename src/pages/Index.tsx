@@ -2,10 +2,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Zap, MessageCircle, Package, Settings, LogOut, Phone } from 'lucide-react';
-import CustomerSupport from '@/components/CustomerSupport';
+import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="mobile-container">
@@ -46,13 +47,16 @@ const Index = () => {
       <div className="p-6 space-y-6">
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-4">
-          <Card className="electric-shadow border-border/50 hover:shadow-lg transition-smooth cursor-pointer">
+          <Card 
+            className="electric-shadow border-border/50 hover:shadow-lg transition-smooth cursor-pointer"
+            onClick={() => navigate('/chat')}
+          >
             <CardContent className="p-4 text-center">
               <div className="rounded-full p-3 bg-primary/10 w-fit mx-auto mb-3">
                 <MessageCircle className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="font-semibold text-foreground mb-1">Ask Support</h3>
-              <p className="text-xs text-muted-foreground">Get instant help</p>
+              <h3 className="font-semibold text-foreground mb-1">Chat Support</h3>
+              <p className="text-xs text-muted-foreground">Get instant AI help</p>
             </CardContent>
           </Card>
 
@@ -67,8 +71,20 @@ const Index = () => {
           </Card>
         </div>
 
-        {/* Customer Support FAQ */}
-        <CustomerSupport />
+        {/* Recent Activity */}
+        <Card className="electric-shadow border-border/50">
+          <CardHeader>
+            <CardTitle className="text-lg text-foreground">Recent Activity</CardTitle>
+            <CardDescription>Your latest interactions</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8 text-muted-foreground">
+              <MessageCircle className="h-12 w-12 mx-auto mb-3 opacity-50" />
+              <p>No recent activity</p>
+              <p className="text-sm">Start a chat to get help</p>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Help & Settings */}
         <div className="space-y-3">
