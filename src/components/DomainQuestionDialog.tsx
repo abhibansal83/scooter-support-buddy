@@ -4,40 +4,58 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Plus, Edit } from 'lucide-react';
 import { DomainQuestion } from '@/hooks/useDomainQuestions';
 
 interface DomainQuestionDialogProps {
-  onSubmit: (data: Omit<DomainQuestion, 'id' | 'created_at' | 'updated_at' | 'created_by'>) => Promise<any>;
+  onSubmit: (data: {
+    question: string;
+    answer: string;
+    category?: string;
+    keywords?: string[];
+  }) => Promise<any>;
+  isSubmitting: boolean;
   question?: DomainQuestion;
   trigger?: React.ReactNode;
 }
 
-export const DomainQuestionDialog = ({ onSubmit, question, trigger }: DomainQuestionDialogProps) => {
+export const DomainQuestionDialog = ({ 
+  onSubmit, 
+  isSubmitting, 
+  question,
+  trigger 
+}: DomainQuestionDialogProps) => {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     question: question?.question || '',
     answer: question?.answer || '',
     category: question?.category || '',
-    is_active: question?.is_active ?? true,
+    keywords: question?.keywords?.join(', ') || '',
   });
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    
+    if (!formData.question.trim() || !formData.answer.trim()) {
+      return;
+    }
 
     try {
-      await onSubmit(formData);
-      setOpen(false);
+      await onSubmit({
+        question: formData.question.trim(),
+        answer: formData.answer.trim(),
+        category: formData.category.trim() || undefined,
+        keywords: formData.keywords 
+          ? formData.keywords.split(',').map(k => k.trim()).filter(k => k)
+          : undefined,
+      });
+      
       if (!question) {
-        setFormData({ question: '', answer: '', category: '', is_active: true });
+        setFormData({ question: '', answer: '', category: '', keywords: '' });
       }
+      setOpen(false);
     } catch (error) {
-      console.error('Error submitting question:', error);
-    } finally {
-      setLoading(false);
+      // Error handling is done in the hook
     }
   };
 
@@ -45,65 +63,72 @@ export const DomainQuestionDialog = ({ onSubmit, question, trigger }: DomainQues
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button variant="default" size="sm">
-            {question ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-            {question ? 'Edit' : 'Add Question'}
+          <Button>
+            {question ? <Edit className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
+            {question ? 'Edit Question' : 'Add Question'}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>{question ? 'Edit' : 'Add'} Domain Question</DialogTitle>
+          <DialogTitle>
+            {question ? 'Edit Domain Question' : 'Add New Domain Question'}
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="question">Question</Label>
+          <div className="space-y-2">
+            <Label htmlFor="question">Question *</Label>
             <Textarea
               id="question"
+              placeholder="Enter the question..."
               value={formData.question}
               onChange={(e) => setFormData(prev => ({ ...prev, question: e.target.value }))}
-              placeholder="Enter the question..."
               required
+              rows={3}
             />
           </div>
           
-          <div>
-            <Label htmlFor="answer">Answer</Label>
+          <div className="space-y-2">
+            <Label htmlFor="answer">Answer *</Label>
             <Textarea
               id="answer"
+              placeholder="Enter the answer..."
               value={formData.answer}
               onChange={(e) => setFormData(prev => ({ ...prev, answer: e.target.value }))}
-              placeholder="Enter the answer..."
-              rows={4}
               required
+              rows={4}
             />
           </div>
           
-          <div>
-            <Label htmlFor="category">Category (Optional)</Label>
+          <div className="space-y-2">
+            <Label htmlFor="category">Category</Label>
             <Input
               id="category"
+              placeholder="e.g., Billing, Technical Support, General"
               value={formData.category}
               onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-              placeholder="e.g., Technical, General, Support"
             />
           </div>
           
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="is_active"
-              checked={formData.is_active}
-              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
+          <div className="space-y-2">
+            <Label htmlFor="keywords">Keywords</Label>
+            <Input
+              id="keywords"
+              placeholder="Enter keywords separated by commas"
+              value={formData.keywords}
+              onChange={(e) => setFormData(prev => ({ ...prev, keywords: e.target.value }))}
             />
-            <Label htmlFor="is_active">Active</Label>
+            <p className="text-sm text-muted-foreground">
+              Keywords help the chatbot match user queries to this answer
+            </p>
           </div>
           
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Saving...' : question ? 'Update' : 'Add'} Question
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : (question ? 'Update' : 'Add Question')}
             </Button>
           </div>
         </form>

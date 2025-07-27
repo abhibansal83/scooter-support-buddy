@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from './useAuth';
+import { toast } from 'sonner';
 
 export interface DomainQuestion {
   id: string;
   question: string;
   answer: string;
   category?: string;
+  keywords?: string[];
   is_active: boolean;
   created_by: string;
   created_at: string;
@@ -15,11 +17,14 @@ export interface DomainQuestion {
 
 export const useDomainQuestions = () => {
   const [questions, setQuestions] = useState<DomainQuestion[]>([]);
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user, isAdmin } = useAuth();
 
   const loadQuestions = async () => {
-    setLoading(true);
+    if (!user) return;
+
+    setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from('domain_questions')
@@ -29,27 +34,31 @@ export const useDomainQuestions = () => {
       if (error) throw error;
       setQuestions(data || []);
     } catch (error) {
-      console.error('Error loading questions:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load domain questions",
-        variant: "destructive",
-      });
+      console.error('Error loading domain questions:', error);
+      toast.error('Failed to load domain questions');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const addQuestion = async (question: Omit<DomainQuestion, 'id' | 'created_at' | 'updated_at' | 'created_by'>) => {
-    try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) throw new Error('User not authenticated');
+  const addQuestion = async (questionData: {
+    question: string;
+    answer: string;
+    category?: string;
+    keywords?: string[];
+  }) => {
+    if (!user || !isAdmin) {
+      toast.error('Only admins can add domain questions');
+      return;
+    }
 
+    setIsSubmitting(true);
+    try {
       const { data, error } = await supabase
         .from('domain_questions')
         .insert({
-          ...question,
-          created_by: user.user.id,
+          ...questionData,
+          created_by: user.id,
         })
         .select()
         .single();
@@ -57,24 +66,24 @@ export const useDomainQuestions = () => {
       if (error) throw error;
 
       setQuestions(prev => [data, ...prev]);
-      toast({
-        title: "Success",
-        description: "Domain question added successfully",
-      });
-
+      toast.success('Domain question added successfully');
       return data;
     } catch (error) {
-      console.error('Error adding question:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add domain question",
-        variant: "destructive",
-      });
+      console.error('Error adding domain question:', error);
+      toast.error('Failed to add domain question');
       throw error;
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const updateQuestion = async (id: string, updates: Partial<DomainQuestion>) => {
+    if (!user || !isAdmin) {
+      toast.error('Only admins can update domain questions');
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
       const { data, error } = await supabase
         .from('domain_questions')
@@ -88,25 +97,24 @@ export const useDomainQuestions = () => {
       setQuestions(prev => 
         prev.map(q => q.id === id ? data : q)
       );
-
-      toast({
-        title: "Success",
-        description: "Domain question updated successfully",
-      });
-
+      toast.success('Domain question updated successfully');
       return data;
     } catch (error) {
-      console.error('Error updating question:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update domain question",
-        variant: "destructive",
-      });
+      console.error('Error updating domain question:', error);
+      toast.error('Failed to update domain question');
       throw error;
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const deleteQuestion = async (id: string) => {
+    if (!user || !isAdmin) {
+      toast.error('Only admins can delete domain questions');
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
       const { error } = await supabase
         .from('domain_questions')
@@ -116,28 +124,26 @@ export const useDomainQuestions = () => {
       if (error) throw error;
 
       setQuestions(prev => prev.filter(q => q.id !== id));
-      toast({
-        title: "Success",
-        description: "Domain question deleted successfully",
-      });
+      toast.success('Domain question deleted successfully');
     } catch (error) {
-      console.error('Error deleting question:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete domain question",
-        variant: "destructive",
-      });
+      console.error('Error deleting domain question:', error);
+      toast.error('Failed to delete domain question');
       throw error;
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   useEffect(() => {
-    loadQuestions();
-  }, []);
+    if (user) {
+      loadQuestions();
+    }
+  }, [user]);
 
   return {
     questions,
-    loading,
+    isLoading,
+    isSubmitting,
     addQuestion,
     updateQuestion,
     deleteQuestion,
