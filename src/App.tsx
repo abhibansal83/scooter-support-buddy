@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Chat from "./pages/Chat";
 import SupportQueries from "./pages/SupportQueries";
+import SupportDashboard from "./pages/SupportDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -36,6 +37,11 @@ const App = () => (
         <Route path="/support-queries" element={
           <ProtectedRoute>
             <SupportQueries />
+          </ProtectedRoute>
+        } />
+        <Route path="/support-dashboard" element={
+          <ProtectedRoute>
+            <SupportDashboard />
           </ProtectedRoute>
         } />
         <Route path="/admin" element={

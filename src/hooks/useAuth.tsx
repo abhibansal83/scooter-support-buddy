@@ -7,6 +7,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   isAdmin: boolean;
+  isSupport: boolean;
   signInWithOtp: (phone: string) => Promise<{ error: any }>;
   verifyOtp: (phone: string, token: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -31,14 +32,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSupport, setIsSupport] = useState(false);
 
-  const checkUserRole = async (userId: string) => {
+  const checkUserRole = async (userId: string, role: 'admin' | 'support') => {
     try {
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
-        .eq('role', 'admin')
+        .eq('role', role)
         .single();
 
       if (error && error.code !== 'PGRST116') {
@@ -91,11 +93,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               });
             }
 
-            const adminStatus = await checkUserRole(session.user.id);
+            const adminStatus = await checkUserRole(session.user.id, 'admin');
+            const supportStatus = await checkUserRole(session.user.id, 'support');
             setIsAdmin(adminStatus);
+            setIsSupport(supportStatus);
           }, 0);
         } else if (!session?.user) {
           setIsAdmin(false);
+          setIsSupport(false);
         }
       }
     );
@@ -163,6 +168,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     session,
     loading,
     isAdmin,
+    isSupport,
     signInWithOtp,
     verifyOtp,
     signOut,

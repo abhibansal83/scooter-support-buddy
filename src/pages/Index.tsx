@@ -5,7 +5,7 @@ import { Zap, MessageCircle, Package, Settings, LogOut, Phone, HelpCircle } from
 import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
-  const { user, signOut, isAdmin } = useAuth();
+  const { user, signOut, isAdmin, isSupport } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -110,6 +110,20 @@ const Index = () => {
               <div className="text-sm text-muted-foreground">Manage your preferences</div>
             </div>
           </Button>
+
+          {isSupport && (
+            <Button
+              variant="outline"
+              className="w-full justify-start py-6 text-left"
+              onClick={() => navigate('/support-dashboard')}
+            >
+              <HelpCircle className="h-5 w-5 mr-3" />
+              <div>
+                <div className="font-medium">Support Dashboard</div>
+                <div className="text-sm text-muted-foreground">Manage user support queries</div>
+              </div>
+            </Button>
+          )}
 
           {isAdmin && (
             <Button
