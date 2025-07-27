@@ -6,6 +6,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  isAdmin: boolean;
   signInWithOtp: (phone: string) => Promise<{ error: any }>;
   verifyOtp: (phone: string, token: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -29,6 +30,28 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const checkUserRole = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error checking user role:', error);
+        return false;
+      }
+
+      return !!data;
+    } catch (error) {
+      console.error('Error checking user role:', error);
+      return false;
+    }
+  };
 
   const cleanupAuthState = () => {
     localStorage.removeItem('supabase.auth.token');
@@ -52,7 +75,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUser(session?.user ?? null);
         setLoading(false);
 
-        // Create profile if user signs up
+        // Create profile and check admin role if user signs in
         if (event === 'SIGNED_IN' && session?.user) {
           setTimeout(async () => {
             const { data: existingProfile } = await supabase
@@ -67,7 +90,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 phone_number: session.user.phone,
               });
             }
+
+            const adminStatus = await checkUserRole(session.user.id);
+            setIsAdmin(adminStatus);
           }, 0);
+        } else if (!session?.user) {
+          setIsAdmin(false);
         }
       }
     );
@@ -134,6 +162,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     user,
     session,
     loading,
+    isAdmin,
     signInWithOtp,
     verifyOtp,
     signOut,

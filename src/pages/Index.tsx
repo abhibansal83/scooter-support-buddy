@@ -5,7 +5,7 @@ import { Zap, MessageCircle, Package, Settings, LogOut, Phone, HelpCircle } from
 import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -110,6 +110,20 @@ const Index = () => {
               <div className="text-sm text-muted-foreground">Manage your preferences</div>
             </div>
           </Button>
+
+          {isAdmin && (
+            <Button
+              variant="outline"
+              className="w-full justify-start py-6 text-left"
+              onClick={() => navigate('/admin')}
+            >
+              <Settings className="h-5 w-5 mr-3" />
+              <div>
+                <div className="font-medium">Admin Dashboard</div>
+                <div className="text-sm text-muted-foreground">Manage domain questions</div>
+              </div>
+            </Button>
+          )}
         </div>
       </div>
     </div>
