@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +22,7 @@ import { useChat } from '@/hooks/useChat';
 import { formatDistanceToNow } from 'date-fns';
 
 const ChatInterface = () => {
+  const navigate = useNavigate();
   const {
     conversations,
     currentConversation,
@@ -176,15 +178,26 @@ const ChatInterface = () => {
                 </p>
               </div>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={startNewChat}
-              className="gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              New Chat
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={startNewChat}
+                className="gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                New Chat
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/')}
+                className="gap-2"
+              >
+                <X className="h-4 w-4" />
+                Close
+              </Button>
+            </div>
           </div>
         </CardHeader>
       </Card>
