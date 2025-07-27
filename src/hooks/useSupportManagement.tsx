@@ -29,18 +29,31 @@ export const useSupportManagement = () => {
 
     setIsLoading(true);
     try {
+      // First, try to get queries without profiles join to see if that works
       const { data, error } = await supabase
         .from('support_queries')
-        .select(`
-          *,
-          profiles (
-            phone_number
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setQueries((data as SupportQueryWithProfile[]) || []);
+      
+      // Then get profiles data separately for each user_id
+      const queriesWithProfiles = await Promise.all(
+        (data || []).map(async (query) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('phone_number')
+            .eq('user_id', query.user_id)
+            .single();
+          
+          return {
+            ...query,
+            profiles: profile || undefined
+          };
+        })
+      );
+
+      setQueries(queriesWithProfiles as SupportQueryWithProfile[]);
     } catch (error: any) {
       toast({
         title: "Error",
