@@ -1,7 +1,7 @@
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Zap, MessageCircle, Package, Settings, LogOut, Phone } from 'lucide-react';
+import { Zap, MessageCircle, Package, Settings, LogOut, Phone, HelpCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
@@ -88,6 +88,18 @@ const Index = () => {
 
         {/* Help & Settings */}
         <div className="space-y-3">
+          <Button
+            variant="outline"
+            className="w-full justify-start py-6 text-left"
+            onClick={() => navigate('/support-queries')}
+          >
+            <HelpCircle className="h-5 w-5 mr-3" />
+            <div>
+              <div className="font-medium">Support Queries</div>
+              <div className="text-sm text-muted-foreground">View your submitted queries and status</div>
+            </div>
+          </Button>
+          
           <Button
             variant="outline"
             className="w-full justify-start py-6 text-left"

@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useChat } from '@/hooks/useChat';
 import { formatDistanceToNow } from 'date-fns';
+import SupportQueryDialog from './SupportQueryDialog';
 
 const ChatInterface = () => {
   const navigate = useNavigate();
@@ -259,11 +260,19 @@ const ChatInterface = () => {
                       </div>
                     )}
                     
-                    <p className={`text-xs mt-2 opacity-70 ${
-                      message.role === 'user' ? 'text-primary-foreground' : 'text-muted-foreground'
-                    }`}>
-                      {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
-                    </p>
+                     <div className="flex items-center justify-between mt-2">
+                       <p className={`text-xs opacity-70 ${
+                         message.role === 'user' ? 'text-primary-foreground' : 'text-muted-foreground'
+                       }`}>
+                         {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
+                       </p>
+                       {message.role === 'assistant' && (
+                         <SupportQueryDialog 
+                           messageId={message.id} 
+                           messageContent={message.content}
+                         />
+                       )}
+                     </div>
                   </div>
                   
                   {message.role === 'user' && (

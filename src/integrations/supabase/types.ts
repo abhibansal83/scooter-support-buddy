@@ -103,6 +103,36 @@ export type Database = {
         }
         Relationships: []
       }
+      support_queries: {
+        Row: {
+          chat_message_id: string | null
+          created_at: string
+          id: string
+          query_content: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          chat_message_id?: string | null
+          created_at?: string
+          id?: string
+          query_content: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          chat_message_id?: string | null
+          created_at?: string
+          id?: string
+          query_content?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
