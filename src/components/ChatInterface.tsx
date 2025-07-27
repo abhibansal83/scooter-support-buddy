@@ -89,14 +89,25 @@ const ChatInterface = () => {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg text-foreground">Chat History</CardTitle>
-              <Button
-                size="sm"
-                onClick={startNewChat}
-                className="gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                New Chat
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/')}
+                  className="gap-2"
+                >
+                  <X className="h-4 w-4" />
+                  Back
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={startNewChat}
+                  className="gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  New Chat
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
